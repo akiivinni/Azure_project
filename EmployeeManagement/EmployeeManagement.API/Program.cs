@@ -17,6 +17,13 @@ builder.Services.AddScoped<IEmployeeService, EmployeeService>();
 
 var app = builder.Build();
 
+if (builder.Configuration.GetValue<bool>("Database:ApplyMigrations"))
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+    await dbContext.Database.MigrateAsync();
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
